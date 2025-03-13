@@ -9,7 +9,7 @@ from pydantic_ai.providers.openai import OpenAIProvider
 
 # Define Ollama Model for Pydantic AI
 ollama_model = OpenAIModel(
-    model_name='llama3:latest',
+    model_name='llama3.2',
     provider=OpenAIProvider(base_url='http://localhost:11434/v1')  # Ensure Ollama API is running
 )
 
@@ -27,13 +27,9 @@ async def search_csv(query, data):
     if data is None:
         return "Error: No data available."
 
-    system_prompt = f"""You are an expert in analyzing tabular data.
-    Below is a dataset from a CSV file:
-    
-    {data.to_string(index=False)}
-    
-    Answer concisely based on this data. The user's question is: {query}
-    Provide only relevant insights without adding unnecessary information."""
+    system_prompt = f"""You are an expert advisor. Take a look at the input csv file which is converted into a text file.
+    After processing the dataset as stated above. The dataset is {data.to_string()}. Answer the following question based on that data.{query}
+    Response must be answer to the question. Response must be to the point. """
 
     agent = Agent(
         ollama_model,
@@ -45,7 +41,7 @@ async def search_csv(query, data):
 
 def query_csv(user_query):
     """Handles user queries via Ollama."""
-    file_path = "/Users/nawdeepkumar/gradio_csv_app/Housing.csv"  # Update this path
+    file_path = "./Housing.csv"  # Update this path
     data = load_csv(file_path)
 
     if data is None:
@@ -59,7 +55,7 @@ def query_csv(user_query):
 
 def plot_graph(x_col, y_col):
     """Plots a graph from the CSV file."""
-    file_path = "/Users/nawdeepkumar/gradio_csv_app/Housing.csv"  # Update this path
+    file_path = "./Housing.csv"
     data = load_csv(file_path)
 
     if data is None:
